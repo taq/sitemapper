@@ -1,6 +1,6 @@
 require "nokogiri"
 require "test/unit"
-require "#{File.expand_path(File.dirname(__FILE__))}/../lib/site_mapper.rb"
+require "#{File.expand_path(File.dirname(__FILE__))}/../lib/sitemapper.rb"
 require "#{File.expand_path(File.dirname(__FILE__))}/collections.rb"
 
 class SiteMapperTest < Test::Unit::TestCase

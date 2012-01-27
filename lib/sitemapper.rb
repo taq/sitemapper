@@ -20,10 +20,12 @@ module SiteMapper
                end                  
             end
          end
+         content = xml.target!
          File.open(sitemap,"w") do |file|
-            file << xml.to_s
+            file << content
          end
          open("http://www.google.com/webmasters/tools/ping?sitemap=#{sitemapper[:url]}").read if sitemapper[:url]
+         content
       end
    end
 
