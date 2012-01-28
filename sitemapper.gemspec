@@ -3,10 +3,10 @@ $:.push File.expand_path("../lib", __FILE__)
 require "sitemapper/version"
 
 Gem::Specification.new do |s|
-  s.name        = "sitemapper"
+  s.name        = "taq-sitemapper"
   s.version     = SiteMapper::VERSION
   s.authors     = ["Eustaquio Rangel"]
-  s.email       = ["taq@eustaquiorangel.com"]
+  s.email       = ["eustaquiorangel@gmail.com"]
   s.homepage    = ""
   s.summary     = %q{Create a sitemap}
   s.description = %q{Create a sitemap with a data collection}
