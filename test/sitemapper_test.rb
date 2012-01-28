@@ -1,7 +1,17 @@
+require "rubygems"
 require "nokogiri"
 require "test/unit"
-require "#{File.expand_path(File.dirname(__FILE__))}/collections.rb"
+require "active_record"
 require "#{File.expand_path(File.dirname(__FILE__))}/../lib/sitemapper.rb"
+
+ActiveRecord::Base.establish_connection({ 
+   adapter: "sqlite3",
+   database: "/tmp/sitemapper.sqlite"
+})
+
+class SitemapperTestAR < ActiveRecord::Base  
+   include SiteMapper
+end
 
 class SiteMapperTest < Test::Unit::TestCase
    def setup
@@ -36,5 +46,22 @@ class SiteMapperTest < Test::Unit::TestCase
       @sitemapper.write_sitemap(@arraytest.entries,extras.entries) 
       doc = Nokogiri::XML(File.open(@sitemapper.sitemap))
       assert_equal @arraytest.entries.size+extras.size, doc.search("url").size
+   end
+
+   def test_ar_class_methods
+      assert_respond_to SitemapperTestAR, :write_sitemap
+      assert_respond_to SitemapperTestAR, :ping
+      assert_respond_to SitemapperTestAR, :sitemap_loc
+      assert_respond_to SitemapperTestAR, :sitemap_lastmod
+   end
+   
+   def test_rw_class_methods
+      str = "test"
+      SitemapperTestAR.sitemap_loc = str
+      assert_equal str, SitemapperTestAR.sitemap_loc
+   end
+
+   def test_class_methods_default_values
+      # assert_equal "daily", SitemapperTestAR.sitemap_changefreq
    end
 end
