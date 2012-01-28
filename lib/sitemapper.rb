@@ -2,21 +2,33 @@ require "builder"
 require "open-uri"
 
 module SiteMapper
-   module ClassMethods
-      def write_sitemap(sitemap,meth,extras=nil,extra_meth=nil)
-         xml         = Builder::XmlMarkup.new(:indent=>2)
-         extra_meth  = extra_meth ? extra_meth : meth
-         col         = send(meth)
-         col         = extras.send(extra_meth) + col if extras
-         xml.urlset(:xmlns => "http://www.sitemaps.org/schemas/sitemap/0.9") do
-            col.each do |value|
-               loc      = value.respond_to?(sitemapper[:loc].to_s.to_sym)        ? value.send(sitemapper[:loc])        : value[sitemapper[:loc]]
-               lastmod  = value.respond_to?(sitemapper[:lastmod].to_s.to_sym)    ? value.send(sitemapper[:lastmod])    : value[sitemapper[:lastmod]]
-               change   = value.respond_to?(sitemapper[:changefreq].to_s.to_sym) ? value.send(sitemapper[:changefreq]) : value[:changefreq]
-               priority = value.respond_to?(sitemapper[:priority].to_s.to_sym)   ? value.send(sitemapper[:priority])   : value[:priority]
+   class SiteMapper
+      attr_accessor :url, :loc, :lastmod, :changefreq, :priority, :sitemap
 
-               change   = sitemapper[:changefreq]  if !change
-               priority = sitemapper[:priority]    if !priority
+      def initialize
+         @url        = nil
+         @loc        = :loc
+         @lastmod    = :lastmod
+         @changefreq = "daily"
+         @priority   = 1.00
+         @sitemap    = nil
+      end
+
+      def write_sitemap(collection,extra_collection=nil)
+         return false if @sitemap.nil?
+
+         xml = Builder::XmlMarkup.new(:indent=>2)
+         collection = extra_collection + collection if extra_collection
+
+         xml.urlset(:xmlns => "http://www.sitemaps.org/schemas/sitemap/0.9") do
+            collection.each do |value|
+               loc      = value.respond_to?(@loc.to_s.to_sym)        ? value.send(@loc)        : value[@loc]
+               lastmod  = value.respond_to?(@lastmod.to_s.to_sym)    ? value.send(@lastmod)    : value[@lastmod]
+               change   = value.respond_to?(@changefreq.to_s.to_sym) ? value.send(@changefreq) : value[@changefreq]
+               priority = value.respond_to?(@priority.to_s.to_sym)   ? value.send(@priority)   : value[@priority]
+
+               change   = @changefreq  if !change
+               priority = @priority    if !priority
 
                xml.url do
                   xml.loc        loc
@@ -30,21 +42,12 @@ module SiteMapper
          File.open(sitemap,"w") do |file|
             file << content
          end
-         open("http://www.google.com/webmasters/tools/ping?sitemap=#{sitemapper[:url]}").read if sitemapper[:url]
          content
       end
-   end
 
-   def self.included(where)
-      class << where
-         attr_accessor :sitemapper
+      def ping
+         return if @url.nil?
+         open("http://www.google.com/webmasters/tools/ping?sitemap=#{@url}").read
       end
-      where.extend(ClassMethods)
-      where.sitemapper = {}
-      where.sitemapper[:url]        = nil
-      where.sitemapper[:loc]        = :loc
-      where.sitemapper[:lastmod]    = :lastmod
-      where.sitemapper[:changefreq] = "daily"
-      where.sitemapper[:priority]   = 1.00
    end
 end

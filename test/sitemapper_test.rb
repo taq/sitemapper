@@ -1,43 +1,40 @@
 require "nokogiri"
 require "test/unit"
-require "#{File.expand_path(File.dirname(__FILE__))}/../lib/sitemapper.rb"
 require "#{File.expand_path(File.dirname(__FILE__))}/collections.rb"
+require "#{File.expand_path(File.dirname(__FILE__))}/../lib/sitemapper.rb"
 
 class SiteMapperTest < Test::Unit::TestCase
    def setup
-      ArrayTest.new([{url: "One"  , lastmod: Time.now, freq: "monthly", priority: 1}, 
-                     {url: "Two"  , lastmod: Time.now, freq: "monthly", priority: 1}, 
-                     {url: "Three", lastmod: Time.now, freq: "monthly", priority: 1}])
-      ArrayTest.sitemapper[:url] = "http://localhost.com/sitemap.xml"
-      ArrayTest.sitemapper[:loc] = :url
-      ArrayTest.sitemapper[:changefreq] = :freq
-      ArrayTest.sitemapper[:priority] = :priority
+      @arraytest = [{url: "One"  , lastmod: Time.now, freq: "monthly", priority: 1}, 
+                    {url: "Two"  , lastmod: Time.now, freq: "monthly", priority: 1}, 
+                    {url: "Three", lastmod: Time.now, freq: "monthly", priority: 1}]
+
+      @sitemapper = SiteMapper::SiteMapper.new
+      @sitemapper.url = "http://localhost.com/sitemap.xml"
+      @sitemapper.loc = :url
+      @sitemapper.changefreq = :freq
+      @sitemapper.priority = :priority
+      @sitemapper.sitemap = "/tmp/sitemap.xml"
    end   
 
-   def test_write_sitemap_method
-      assert_respond_to ArrayTest, :write_sitemap
-   end
-
    def test_write_sitemap
-      file = "/tmp/sitemap.xml"   
-      File.unlink(file) if File.exists?(file)
-      ArrayTest.write_sitemap(file,:values) 
-      assert File.exists?(file), "sitemap file not found"
+      File.unlink(@sitemapper.sitemap) if File.exists?(@sitemapper.sitemap)
+      @sitemapper.write_sitemap(@arraytest.entries) 
+      assert File.exists?(@sitemapper.sitemap), "sitemap file not found"
    end
 
    def test_url_size
       test_write_sitemap
-      doc = Nokogiri::XML(File.open("/tmp/sitemap.xml"))
-      assert_equal ArrayTest.values.size, doc.search("url").size
+      doc = Nokogiri::XML(File.open(@sitemapper.sitemap))
+      assert_equal @arraytest.entries.size, doc.search("url").size
    end
 
    def test_write_sitemap_with_extras
-      file = "/tmp/sitemap.xml"   
-      File.unlink(file) if File.exists?(file)
-      extras = [{url: "Four", lastmod: Time.now, freq: "monthly", priority: 1}, 
-                {url: "Five", lastmod: Time.now, freq: "monthly", priority: 1}]
-      ArrayTest.write_sitemap(file,:values,extras,:entries) 
-      doc = Nokogiri::XML(File.open("/tmp/sitemap.xml"))
-      assert_equal ArrayTest.values.size+extras.size, doc.search("url").size
+      File.unlink(@sitemapper.sitemap) if File.exists?(@sitemapper.sitemap)
+      extras = [{url: "Four", lastmod: Time.now, freq: "yearly", priority: 0.5}, 
+                {url: "Five", lastmod: Time.now, freq: "yearly", priority: 0.5}]
+      @sitemapper.write_sitemap(@arraytest.entries,extras.entries) 
+      doc = Nokogiri::XML(File.open(@sitemapper.sitemap))
+      assert_equal @arraytest.entries.size+extras.size, doc.search("url").size
    end
 end
