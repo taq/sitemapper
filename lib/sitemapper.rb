@@ -4,13 +4,13 @@ require "open-uri"
 module SiteMapper
    module BaseMethods
       def write_sitemap(collection=nil,extra_collection=nil)
-         sitemap_ref    = @sitemap     || (@sitemap[:sitemap] rescue nil)
+         file_ref       = @file        || (@sitemap[:file] rescue nil)
          loc_ref        = @loc         || (@sitemap[:loc] rescue nil)
          lastmod_ref    = @lastmod     || (@sitemap[:lastmod] rescue nil)
          changefreq_ref = @changefreq  || (@sitemap[:changefreq] rescue nil)
          priority_ref   = @priority    || (@sitemap[:priority] rescue nil)
 
-         return false if sitemap_ref.nil?
+         return false if file_ref.nil?
 
          xml = Builder::XmlMarkup.new(:indent=>2)
          collection = extra_collection + collection if extra_collection
@@ -34,14 +34,14 @@ module SiteMapper
             end
          end
          content = xml.target!
-         File.open(sitemap,"w") do |file|
+         File.open(file_ref,"w") do |file|
             file << content
          end
          content
       end
 
       def ping
-         url_ref = @url || @sitemap_url
+         url_ref = @url || (@sitemap[:url] rescue nil)
          return if url_ref.nil?
          open("http://www.google.com/webmasters/tools/ping?sitemap=#{url_ref}").read
       end
@@ -63,7 +63,7 @@ module SiteMapper
 
    class SiteMapper
       include BaseMethods
-      attr_accessor :url, :loc, :lastmod, :changefreq, :priority, :sitemap
+      attr_accessor :url, :loc, :lastmod, :changefreq, :priority, :file
 
       def initialize
          @url        = nil
@@ -71,7 +71,7 @@ module SiteMapper
          @lastmod    = :lastmod
          @changefreq = "daily"
          @priority   = 1.00
-         @sitemap    = nil
+         @file       = nil
       end
    end
 end
