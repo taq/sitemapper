@@ -6,7 +6,7 @@ require "#{File.expand_path(File.dirname(__FILE__))}/../lib/taq-sitemapper.rb"
 
 ActiveRecord::Base.establish_connection({ 
    adapter: "sqlite3",
-   database: "taq-sitemapper.sqlite"
+   database: "#{File.expand_path(File.dirname(__FILE__))}/taq-sitemapper.sqlite"
 })
 
 class SitemapperTestAR < ActiveRecord::Base  
