@@ -11,10 +11,12 @@ ActiveRecord::Base.establish_connection({
 
 class SitemapperTestAR < ActiveRecord::Base  
    include SiteMapper
+   sitemap[:changefreq] = :freq
+   sitemap[:priority] = :priority
    def self.sitemap_extra
-      [{loc: "One"  , lastmod: Time.now, freq: "monthly", priority: 1}, 
-       {loc: "Two"  , lastmod: Time.now, freq: "monthly", priority: 1}, 
-       {loc: "Three", lastmod: Time.now, freq: "monthly", priority: 1}]
+      [{loc: "One"  , lastmod: Time.now, freq: "yearly", priority: 0.5}, 
+       {loc: "Two"  , lastmod: Time.now, freq: "yearly", priority: 0.5}, 
+       {loc: "Three", lastmod: Time.now, freq: "yearly", priority: 0.5}]
    end
    def loc
       url
@@ -80,7 +82,7 @@ class SiteMapperTest < Test::Unit::TestCase
    end
 
    def test_class_methods_default_values
-      assert_equal "daily", SitemapperTestAR.sitemap[:changefreq]
+      assert_equal :freq, SitemapperTestAR.sitemap[:changefreq]
    end
 
    def test_write_sitemap_on_class
