@@ -8,5 +8,45 @@ sending it a collection with the data to be written and optionally another one
 with extra data. The extra data can be used, for example, to send static urls
 that are not part of the first collection.
 
+require "rubygems"
+require "taq-sitemapper"
 
+data = [{url: "One"  , lastmod: Time.now, freq: "monthly", priority: 1}, 
+        {url: "Two"  , lastmod: Time.now, freq: "monthly", priority: 1}, 
+        {url: "Three", lastmod: Time.now, freq: "monthly", priority: 1}]
 
+extra= [{url: "Four" , lastmod: Time.now, freq: "yearly", priority: 0.5}, 
+        {url: "Five" , lastmod: Time.now, freq: "yearly", priority: 0.5}, 
+        {url: "Six"  , lastmod: Time.now, freq: "yearly", priority: 0.5}]
+
+sitemapper = SiteMapper::SiteMapper.new
+sitemapper.loc  = :url
+sitemapper.changefreq  = :freq
+sitemapper.priority  = :priority
+sitemapper.file = "/tmp/sitemap_class.xml"
+sitemapper.url = "http://localhost.com/sitemap.xml"
+sitemapper.write_sitemap(data.entries)
+
+# extra data
+sitemapper.file = "/tmp/sitemap_class_extra.xml"
+sitemapper.write_sitemap(data.entries,extra.entries)
+
+The default values for the attributes are:
+
+url        = nil
+loc        = :loc
+lastmod    = :lastmod
+changefreq = "daily"
+priority   = 1.00
+file       = nil
+
+The can be changed (as above) to point to some method, attribute or static
+value. For example, if your collection has an attribute called url and you
+want to use it as the loc attribute, you can point that using 
+sitemapper.loc = :url and on the example above. It's important that the extra
+collection have the same attributes as the main collection.
+
+If the file attribute is null, no sitemap file will be written.
+
+If the url attribute is not null, you can use the ping method to send a ping
+to search engines, pointing to the sitemap on the url.

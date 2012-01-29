@@ -2,11 +2,11 @@ require "rubygems"
 require "nokogiri"
 require "test/unit"
 require "active_record"
-require "#{File.expand_path(File.dirname(__FILE__))}/../lib/sitemapper.rb"
+require "#{File.expand_path(File.dirname(__FILE__))}/../lib/taq-sitemapper.rb"
 
 ActiveRecord::Base.establish_connection({ 
    adapter: "sqlite3",
-   database: "sitemapper.sqlite"
+   database: "taq-sitemapper.sqlite"
 })
 
 class SitemapperTestAR < ActiveRecord::Base  
