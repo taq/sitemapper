@@ -7,11 +7,11 @@ Gem::Specification.new do |s|
   s.version     = SiteMapper::VERSION
   s.authors     = ["Eustaquio Rangel"]
   s.email       = ["eustaquiorangel@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/taq/sitemapper"
   s.summary     = %q{Create a sitemap}
   s.description = %q{Create a sitemap with a data collection}
 
-  s.rubyforge_project = "sitemapper"
+  s.rubyforge_project = "taq-sitemapper"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

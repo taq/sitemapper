@@ -1,0 +1,12 @@
+This is a simple class to write a website sitemap file.
+You can use it on two ways:
+
+As a class
+
+You can create a class and tell it to write the sitemap file when needed, 
+sending it a collection with the data to be written and optionally another one
+with extra data. The extra data can be used, for example, to send static urls
+that are not part of the first collection.
+
+
+
