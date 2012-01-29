@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "sitemapper/version"
+require "taq-sitemapper/version"
 
 Gem::Specification.new do |s|
   s.name        = "taq-sitemapper"
