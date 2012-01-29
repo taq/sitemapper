@@ -5,6 +5,26 @@ require "minitest/spec"
 require "minitest/autorun"
 require "#{File.expand_path(File.dirname(__FILE__))}/../lib/taq-sitemapper.rb"
 
+ActiveRecord::Base.establish_connection({ 
+   adapter: "sqlite3",
+   database: "#{File.expand_path(File.dirname(__FILE__))}/taq-sitemapper.sqlite"
+})
+
+class SitemapperTestAR < ActiveRecord::Base  
+   include SiteMapper
+
+   sitemap[:changefreq] = :freq
+   sitemap[:priority] = :priority
+
+   def self.sitemap_extra
+      [{loc: "Four"  , lastmod: Time.now, freq: "yearly", priority: 0.5}, 
+       {loc: "Five"  , lastmod: Time.now, freq: "yearly", priority: 0.5}] 
+   end
+   def loc
+      url
+   end
+end
+
 def get_xml_doc(file)   
    Nokogiri::XML(File.open(file))
 end
@@ -101,6 +121,36 @@ describe SiteMapper do
             for item in (@extras+@data)
                elements.shift.text.must_equal item[:priority].to_s
             end
+         end
+      end
+   end
+
+   describe "Module option" do
+      describe "when asked to write the sitemap file"  do
+          it "show write with no extras" do
+            delete_and_write(SitemapperTestAR.sitemap[:file],SitemapperTestAR)
+            assert File.exists?(SitemapperTestAR.sitemap[:file]), "sitemap file not found"
+          end
+
+          it "show write with extras" do
+            SitemapperTestAR.sitemap[:extra] = :sitemap_extra
+            delete_and_write(SitemapperTestAR.sitemap[:file],SitemapperTestAR)
+            assert File.exists?(SitemapperTestAR.sitemap[:file]), "sitemap file not found"
+          end
+      end
+
+      describe "when asked about the attributes" do
+         it "should have the module base methods" do
+            SitemapperTestAR.must_respond_to :write_sitemap
+            SitemapperTestAR.must_respond_to :ping
+         end
+
+         it "should have the sitemap attribute" do
+            SitemapperTestAR.must_respond_to :sitemap
+         end
+
+         it "should have the all method as the collection method" do
+            SitemapperTestAR.sitemap[:collection].must_equal :all
          end
       end
    end
