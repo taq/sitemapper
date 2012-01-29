@@ -4,11 +4,11 @@ require "open-uri"
 module SiteMapper
    module BaseMethods
       def write_sitemap(collection=nil,extra_collection=nil)
-         sitemap_ref    = @sitemap     || @sitemap_sitemap
-         loc_ref        = @loc         || @sitemap_loc
-         lastmod_ref    = @lastmod     || @sitemap_lastmod
-         changefreq_ref = @changefreq  || @sitemap_changefreq
-         priority_ref   = @priority    || @sitemap_priority
+         sitemap_ref    = @sitemap     || (@sitemap[:sitemap] rescue nil)
+         loc_ref        = @loc         || (@sitemap[:loc] rescue nil)
+         lastmod_ref    = @lastmod     || (@sitemap[:lastmod] rescue nil)
+         changefreq_ref = @changefreq  || (@sitemap[:changefreq] rescue nil)
+         priority_ref   = @priority    || (@sitemap[:priority] rescue nil)
 
          return false if sitemap_ref.nil?
 
@@ -50,16 +50,15 @@ module SiteMapper
    def self.included(where)
       where.extend(BaseMethods)   
       class << where
-         attr_accessor :sitemap_url, :sitemap_loc, :sitemap_lastmod, 
-                       :sitemap_changefreq, :sitemap_priority, 
-                       :sitemap_sitemap
+         attr_accessor :sitemap
       end
-      @sitemap_url        = nil
-      @sitemap_loc        = :loc
-      @sitemap_lastmod    = :lastmod
-      @sitemap_changefreq = "daily"
-      @sitemap_priority   = 1.00
-      @sitemap_sitemap    = nil
+      where.sitemap = {}
+      where.sitemap[:url]        = nil
+      where.sitemap[:loc]        = :loc
+      where.sitemap[:lastmod]    = :lastmod
+      where.sitemap[:changefreq] = "daily"
+      where.sitemap[:priority]   = 1.00
+      where.sitemap[:sitemap]    = nil
    end
 
    class SiteMapper

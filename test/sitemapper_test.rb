@@ -51,17 +51,19 @@ class SiteMapperTest < Test::Unit::TestCase
    def test_ar_class_methods
       assert_respond_to SitemapperTestAR, :write_sitemap
       assert_respond_to SitemapperTestAR, :ping
-      assert_respond_to SitemapperTestAR, :sitemap_loc
-      assert_respond_to SitemapperTestAR, :sitemap_lastmod
+   end
+
+   def test_ar_class_attrs
+      assert_respond_to SitemapperTestAR, :sitemap
    end
    
-   def test_rw_class_methods
+   def test_rw_class_attrs
       str = "test"
-      SitemapperTestAR.sitemap_loc = str
-      assert_equal str, SitemapperTestAR.sitemap_loc
+      SitemapperTestAR.sitemap[:loc] = str
+      assert_equal str, SitemapperTestAR.sitemap[:loc]
    end
 
    def test_class_methods_default_values
-      # assert_equal "daily", SitemapperTestAR.sitemap_changefreq
+      assert_equal "daily", SitemapperTestAR.sitemap[:changefreq]
    end
 end
