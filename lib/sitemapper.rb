@@ -12,6 +12,10 @@ module SiteMapper
 
          return false if file_ref.nil?
 
+         if collection.nil? && !(@sitemap[:collection] rescue nil).nil?
+            collection = send(@sitemap[:collection])
+         end
+
          xml = Builder::XmlMarkup.new(:indent=>2)
          collection = extra_collection + collection if extra_collection
 
@@ -58,7 +62,9 @@ module SiteMapper
       where.sitemap[:lastmod]    = :lastmod
       where.sitemap[:changefreq] = "daily"
       where.sitemap[:priority]   = 1.00
-      where.sitemap[:sitemap]    = nil
+      where.sitemap[:file]       = "/tmp/sitemap.xml"
+      where.sitemap[:collection] = :all
+      where.sitemap[:extra]      = nil
    end
 
    class SiteMapper

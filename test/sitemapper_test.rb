@@ -6,7 +6,7 @@ require "#{File.expand_path(File.dirname(__FILE__))}/../lib/sitemapper.rb"
 
 ActiveRecord::Base.establish_connection({ 
    adapter: "sqlite3",
-   database: "/tmp/sitemapper.sqlite"
+   database: "sitemapper.sqlite"
 })
 
 class SitemapperTestAR < ActiveRecord::Base  
@@ -56,6 +56,14 @@ class SiteMapperTest < Test::Unit::TestCase
    def test_ar_class_attrs
       assert_respond_to SitemapperTestAR, :sitemap
    end
+
+   def test_class_collection
+      assert_equal :all, SitemapperTestAR.sitemap[:collection]
+   end
+
+   def test_class_collection
+      assert_nil SitemapperTestAR.sitemap[:extra]
+   end
    
    def test_rw_class_attrs
       str = "test"
@@ -65,5 +73,14 @@ class SiteMapperTest < Test::Unit::TestCase
 
    def test_class_methods_default_values
       assert_equal "daily", SitemapperTestAR.sitemap[:changefreq]
+   end
+
+   def test_write_sitemap_on_class
+      file = SitemapperTestAR.sitemap[:file]
+      File.unlink(file) if File.exists?(file)
+      SitemapperTestAR.write_sitemap
+      assert File.exists?(file), "sitemap file not found"
+      doc = Nokogiri::XML(File.open(file))
+      assert_equal SitemapperTestAR.all.size, doc.search("url").size
    end
 end
