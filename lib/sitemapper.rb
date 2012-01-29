@@ -15,6 +15,9 @@ module SiteMapper
          if collection.nil? && !(@sitemap[:collection] rescue nil).nil?
             collection = send(@sitemap[:collection])
          end
+         if extra_collection.nil? && !(@sitemap[:extra] rescue nil).nil?
+            extra_collection = send(@sitemap[:extra])
+         end
 
          xml = Builder::XmlMarkup.new(:indent=>2)
          collection = extra_collection + collection if extra_collection

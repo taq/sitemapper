@@ -11,6 +11,14 @@ ActiveRecord::Base.establish_connection({
 
 class SitemapperTestAR < ActiveRecord::Base  
    include SiteMapper
+   def self.sitemap_extra
+      [{loc: "One"  , lastmod: Time.now, freq: "monthly", priority: 1}, 
+       {loc: "Two"  , lastmod: Time.now, freq: "monthly", priority: 1}, 
+       {loc: "Three", lastmod: Time.now, freq: "monthly", priority: 1}]
+   end
+   def loc
+      url
+   end
 end
 
 class SiteMapperTest < Test::Unit::TestCase
@@ -66,9 +74,9 @@ class SiteMapperTest < Test::Unit::TestCase
    end
    
    def test_rw_class_attrs
-      str = "test"
-      SitemapperTestAR.sitemap[:loc] = str
-      assert_equal str, SitemapperTestAR.sitemap[:loc]
+      str = "yearly"
+      SitemapperTestAR.sitemap[:changefreq] = str
+      assert_equal str, SitemapperTestAR.sitemap[:changefreq]
    end
 
    def test_class_methods_default_values
@@ -82,5 +90,16 @@ class SiteMapperTest < Test::Unit::TestCase
       assert File.exists?(file), "sitemap file not found"
       doc = Nokogiri::XML(File.open(file))
       assert_equal SitemapperTestAR.all.size, doc.search("url").size
+   end
+
+   def test_write_sitemap_on_class_with_extras
+      file = SitemapperTestAR.sitemap[:file]
+      File.unlink(file) if File.exists?(file)
+      SitemapperTestAR.sitemap[:extra] = :sitemap_extra
+  
+      SitemapperTestAR.write_sitemap
+      assert File.exists?(file), "sitemap file not found"
+      doc = Nokogiri::XML(File.open(file))
+      assert_equal SitemapperTestAR.all.size+3, doc.search("url").size
    end
 end
